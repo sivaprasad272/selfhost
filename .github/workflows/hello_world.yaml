@@ -28,9 +28,6 @@ jobs:
         Start-Process -Wait -FilePath python-installer.exe -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_launcher=0"
       shell: powershell
 
-    - name: Install dependencies
-      run: pip install -r requirements.txt # If you have any dependencies
-
     - name: Run Hello World
       run: python hello.py
       
