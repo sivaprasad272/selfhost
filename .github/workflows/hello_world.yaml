@@ -43,12 +43,15 @@ jobs:
     steps:
     - name: Create GitHub Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
       with:
-        files: |
-          hello.py
+        files: hello.py
+        tag_name: v1.0  # Replace with your desired tag name
+        draft: false
+        prerelease: false
+        commitish: master  # Replace with your desired branch
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get Release URL
-      run: echo ${{ steps.create_release.outputs.upload_url }}
+      run: echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.create_release.outputs.tag_name }}"
