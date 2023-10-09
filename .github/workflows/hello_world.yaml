@@ -13,14 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Remove Previous Python Installations
-      run: |
-        $pathToRemove = "C:\Windows\System32\actions-runner\_work\_tool\Python"
-        if (Test-Path $pathToRemove) {
-          Remove-Item -Path $pathToRemove -Force -Recurse
-        }
-      shell: powershell
-
+  
     - name: Install Python 3.11.3
       run: |
         # Download Python installer
