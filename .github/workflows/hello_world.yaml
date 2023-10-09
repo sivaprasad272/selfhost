@@ -12,10 +12,12 @@ jobs:
       uses: actions/checkout@v2
     
     - name: Remove Previous Python Installations
-      run: |
-        # Remove previous Python installations
-        Remove-Item -Path "C:\Windows\System32\actions-runner\_work\_tool\Python" -Force -Recurse
-      shell: powershell
+  run: |
+    $pathToRemove = "C:\Windows\System32\actions-runner\_work\_tool\Python"
+    if (Test-Path $pathToRemove) {
+      Remove-Item -Path $pathToRemove -Force -Recurse
+    }
+  shell: powershell
 
     - name: Install Python
       run: |
