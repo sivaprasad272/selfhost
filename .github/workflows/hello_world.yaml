@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted # This specifies that it should run on the self-hosted agent
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
@@ -21,7 +21,7 @@ jobs:
         }
       shell: powershell
 
-    - name: Install Python
+    - name: Install Python 3.11.3
       run: |
         # Download Python installer
         Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.11.3/python-3.11.3-amd64.exe -OutFile python-installer.exe
@@ -29,23 +29,29 @@ jobs:
         # Install Python
         Start-Process -Wait -FilePath python-installer.exe -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_launcher=0"
       shell: powershell
-    - name: Install dependencies
-      run: |
-        # Change the working directory to the subdirectory containing requirements.txt
-        Set-Location -Path ${{ github.workspace }}/myapp
 
-        # Install Python dependencies
-        pip install -r requirements.txt
+    - name: Install Python Dependencies
+      run: |
+        # List the contents of the current directory
+        Get-ChildItem
+        
+        # Install Python dependencies from requirements.txt (if it exists)
+        if (Test-Path "requirements.txt") {
+          pip install -r requirements.txt
+        } else {
+          echo "requirements.txt not found."
+        }
       shell: powershell
+
     - name: Run Hello World
       run: python hello.py
 
   release:
     needs: build
-    runs-on: self-hosted # This specifies that it should run on the self-hosted agent
+    runs-on: self-hosted
 
     steps:
-    - name: Create Release
+    - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
       with:
@@ -55,4 +61,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get Release URL
-      run: echo "${{ steps.create_release.outputs.upload_url }}"
+      run: echo "steps.create_release.outputs.upload_url"
