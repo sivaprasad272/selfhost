@@ -1,5 +1,3 @@
-name: Self-Hosted Build and Release
-
 on:
   push:
     branches:
@@ -18,13 +16,6 @@ jobs:
         # Remove previous Python installations
         Remove-Item -Path "C:\Windows\System32\actions-runner\_work\_tool\Python" -Force -Recurse
       shell: powershell
-    - name: Remove Previous Python Installations
-  run: |
-    $pathToRemove = "C:\Windows\System32\actions-runner\_work\_tool\Python"
-    if (Test-Path $pathToRemove) {
-      Remove-Item -Path $pathToRemove -Force -Recurse
-    }
-  shell: powershell
 
     - name: Install Python
       run: |
@@ -34,6 +25,9 @@ jobs:
         # Install Python
         Start-Process -Wait -FilePath python-installer.exe -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_launcher=0"
       shell: powershell
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt # If you have any dependencies
 
     - name: Run Hello World
       run: python hello.py
@@ -53,4 +47,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get Release URL
-      run: echo "steps.create_release.outputs.upload_url "
+      run: echo "${{ steps.create_release.outputs.upload_url }}"
