@@ -29,16 +29,14 @@ jobs:
         # Install Python
         Start-Process -Wait -FilePath python-installer.exe -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_launcher=0"
       shell: powershell
-
     - name: Install dependencies
-      run: |
-        # Change the working directory to where your requirements.txt file is located
-        Set-Location -Path "path/to/requirements.txt"
-        
-        # Install Python dependencies
-        pip install -r requirements.txt
-      shell: powershell
+  run: |
+    # Change the working directory to the subdirectory containing requirements.txt
+    Set-Location -Path ${{ github.workspace }}/myapp
 
+    # Install Python dependencies
+    pip install -r requirements.txt
+  shell: powershell
     - name: Run Hello World
       run: python hello.py
 
