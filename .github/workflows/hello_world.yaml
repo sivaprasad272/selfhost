@@ -5,14 +5,14 @@ on:
     branches:
       - master
 
-      
 jobs:
   build:
     runs-on: self-hosted
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2  
+      uses: actions/checkout@v2
+      
     - name: Install Python 3.11.3
       run: |
         # Download Python installer
@@ -21,6 +21,7 @@ jobs:
         # Install Python
         Start-Process -Wait -FilePath python-installer.exe -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_launcher=0"
       shell: powershell
+      
     - name: Install Python Dependencies
       run: |
         # Install Python dependencies from requirements.txt (if it exists)
@@ -30,11 +31,10 @@ jobs:
           echo "requirements.txt not found."
         }
       shell: powershell
-    - name: Run Hello World
-      run: python C:/WINDOWS/system32/actions-runner/_work/selfhost/selfhost/hello.py
-      working-directory: ${{ github.workspace }}
+      
     - name: Run Hello World
       run: python hello.py
+      working-directory: ${{ github.workspace }}
 
   release:
     needs: build
@@ -51,4 +51,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get Release URL
-      run: echo "steps.create_release.outputs.upload_url"
+      run: echo ${{ steps.create_release.outputs.upload_url }}
