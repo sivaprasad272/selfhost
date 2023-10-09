@@ -1,4 +1,4 @@
-name: Release Demo
+name: Self-Hosted Build and Release
 
 on:
   push:
@@ -6,9 +6,8 @@ on:
       - master
 
 jobs:
-  release:
-    name: Release
-    runs-on: self-hosted
+  build:
+    runs-on: self-hosted # This specifies that it should run on the self-hosted agent
 
     steps:
     - name: Checkout code
@@ -17,25 +16,27 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.x  # Use the Python version you need
+        python-version: '3.x' # Replace with your desired Python version
 
     - name: Install dependencies
-      run: pip install -r requirements.txt  # If you have any dependencies
+      run: pip install -r requirements.txt # If you have any dependencies
 
-    - name: Build Release Artifact
-      run: |
-        python hello.py  # Run your Python script
-        mkdir release
-        mv hello.py release/
-        tar -czvf release.tar.gz release/
-      shell: bash
-
+    - name: Run Hello World
+      run: python hello.py
+      
+  release:
+    needs: build
+    runs-on: self-hosted # This specifies that it should run on the self-hosted agent
+    
+    steps:
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       with:
         files: |
-          release.tar.gz
-        token: ${{ secrets.GITHUB_TOKEN }}
+          hello.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get Release URL
+      run: echo "Release URL: ${{ steps.create_release.outputs.upload_url }}"
