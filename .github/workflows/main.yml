@@ -1,5 +1,4 @@
-name: Self-Hosted Build and Release
-
+name: Build and Release
 
 on:
   workflow_dispatch:
@@ -9,7 +8,6 @@ on:
         required: true
         default: 'master'
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,24 +15,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Python 3.11.3
-        run: |
-          # Download Python installer
-          Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.11.3/python-3.11.3-amd64.exe -OutFile python-installer.exe
-          # Install Python
-          Start-Process -Wait -FilePath python-installer.exe -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_launcher=0"
-        shell: bash
-      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
       - name: Install Python Dependencies
         run: |
           # Install Python dependencies from requirements.txt (if it exists)
-          if (Test-Path "requirements.txt") {
-            pip install -r requirements.txt
-          } else {
+          if [ -f "requirements.txt" ]; then
+            python -m pip install -r requirements.txt
+          else
             echo "requirements.txt not found."
-          }
-        shell: bash
-      
+          fi
+
       - name: Run Hello World
         run: python hello.py
         working-directory: ${{ github.workspace }}
@@ -53,7 +47,6 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-          #RUN_NUMBER: ${{ github.run_number }}
 
       - name: Get Release URL
         run: echo "Release URL:https://github.com/${{ github.repository }}/releases/tag/v1.${{ github.run_number }}"
