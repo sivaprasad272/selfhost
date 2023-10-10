@@ -1,12 +1,9 @@
 name: Build and Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch name'
-        required: true
-        default: 'master'
+  push:
+    branches:
+      - master
 
 jobs:
   build:
