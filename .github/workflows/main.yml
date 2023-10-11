@@ -1,5 +1,3 @@
-name: Build and Release
-
 on:
   push:
     branches:
@@ -19,7 +17,6 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          # Install Python dependencies from requirements.txt (if it exists)
           if [ -f "requirements.txt" ]; then
             python -m pip install -r requirements.txt
           else
@@ -35,15 +32,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Calculate Semantic Version
+        id: calculate_version
+        run: |
+          # Replace this with your logic to calculate the semantic version
+          # Example: Calculate the version based on the date
+          calculated_version=$(date +'%Y.%m.%d')
+          echo "::set-output name=version::$calculated_version"
+        shell: bash
+
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: "v1.${{ github.run_number }}"
+          tag_name: "v1.${{ steps.calculate_version.outputs.version }}"
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Get Release URL
-        run: echo "Release URL:https://github.com/${{ github.repository }}/releases/tag/v1.${{ github.run_number }}"
+        run: |
+          release_url="https://github.com/${{ github.repository }}/releases/tag/v1.${{ steps.calculate_version.outputs.version }}"
+          echo "Release URL: $release_url"
