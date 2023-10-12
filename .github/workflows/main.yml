@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -13,45 +13,39 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          python-version: '3.11.3'
 
       - name: Install Python Dependencies
         run: |
-          if [ -f "requirements.txt" ]; then
+          if (Test-Path "requirements.txt") {
             python -m pip install -r requirements.txt
-          else
-            echo "requirements.txt not found."
-          fi
+          } else {
+            Write-Host "requirements.txt not found."
+          }
 
       - name: Run Hello World
         run: python hello.py
         working-directory: ${{ github.workspace }}
+        shell: powershell
 
   release:
     needs: build
-    runs-on: ubuntu-latest
-
+    runs-on: self-hosted
     steps:
       - name: Calculate Semantic Version
         id: calculate_version
         run: |
-          # Replace this with your logic to calculate the semantic version
-          # Example: Calculate the version based on the date
-          calculated_version=$(date +'%Y.%m.%d')
-          echo "::set-output name=version::$calculated_version"
-        shell: bash
+          $calculated_version = Get-Date -Format 'yyyyMMdd'
+          Write-Host "Calculated version: $calculated_version"
+          Write-Host "##vso[task.setvariable variable=version;isOutput=true]$calculated_version"
 
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: "${{ steps.calculate_version.outputs.version }}"
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          $tag_name = $env:version
+          Write-Host "Creating GitHub Release with tag $tag_name"
 
       - name: Get Release URL
         run: |
-          release_url="https://github.com/${{ github.repository }}/releases/tag/v1.${{ steps.calculate_version.outputs.version }}"
-          echo "Release URL: $release_url"
+          $release_url = "https://github.com/${{ github.repository }}/releases/tag/v$env:version"
+          Write-Host "Release URL: $release_url"
